@@ -9,9 +9,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    GraphicsScene scene;
+    GraphicsScene *scene = new GraphicsScene();
 
-    ui->graphicsView->setScene(&scene);
+    ui->graphicsView->setScene(scene);
 }
 
 MainWindow::~MainWindow()
