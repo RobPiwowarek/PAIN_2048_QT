@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    GraphicsScene *scene = new GraphicsScene();
+    scene = new GraphicsScene();
 
     ui->graphicsView->setScene(scene);
 
@@ -30,6 +30,5 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 
 void MainWindow::resetGame()
 {
-    GraphicsScene * scene = dynamic_cast<GraphicsScene*>(this->ui->graphicsView->scene());
     scene->resetGame();
 }
