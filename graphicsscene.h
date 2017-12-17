@@ -16,6 +16,7 @@ public:
     GraphicsScene(QObject *parent = Q_NULLPTR);
     void keyPressEvent(QKeyEvent *keyEvent);
     void resetGame();
+    void changeSpawnMode();
 
 signals:
     void setScore(const QString &);
@@ -32,12 +33,14 @@ private:
     void spawnNewTileAtRight();
     void spawnNewTileAtLeft();
     void spawnNewTileAtTop();
+    void spawnNewTileRandomly();
     void isOver();
     void animateMove(Tile* tile, qreal dx, qreal dy, QTimeLine *timer);
     Tile* tiles[4][4];
     QVector<Tile*> tilesToDelete;
     bool gameover = false;
     bool animation = false;
+    bool randomSpawn = false;
     int score = 0;
 };
 

@@ -1,5 +1,6 @@
 #include "graphicsscene.h"
 #include <iostream>
+#include <algorithm>
 
 GraphicsScene::GraphicsScene(QObject *parent){
     int i = 0, j = 0;
@@ -97,6 +98,11 @@ void GraphicsScene::resetGame()
     this->addItem(secondTile);
 }
 
+void GraphicsScene::changeSpawnMode()
+{
+    randomSpawn = !randomSpawn;
+}
+
 void GraphicsScene::up(){
     bool shouldSpawn = false;
 
@@ -160,7 +166,10 @@ void GraphicsScene::up(){
     timer->start();
 
     if(shouldSpawn){
-        spawnNewTileAtBottom();
+        if(randomSpawn)
+            spawnNewTileRandomly();
+        else
+            spawnNewTileAtBottom();
     }
 }
 
@@ -227,7 +236,10 @@ void GraphicsScene::down(){
     timer->start();
 
     if(shouldSpawn){
-        spawnNewTileAtTop();
+        if(randomSpawn)
+            spawnNewTileRandomly();
+        else
+            spawnNewTileAtTop();
     }
 }
 
@@ -294,7 +306,10 @@ void GraphicsScene::left(){
     timer->start();
 
     if(shouldSpawn){
-        spawnNewTileAtRight();
+        if(randomSpawn)
+            spawnNewTileRandomly();
+        else
+            spawnNewTileAtRight();
     }
 }
 
@@ -361,7 +376,12 @@ void GraphicsScene::right(){
     timer->start();
 
     if(shouldSpawn){
-        spawnNewTileAtLeft();
+        if(randomSpawn){
+            spawnNewTileRandomly();
+        }
+        else{
+            spawnNewTileAtLeft();
+        }
     }
 }
 
@@ -377,8 +397,6 @@ void GraphicsScene::spawnNewTileAtBottom(){
         x = 0;
 
         while(x < 4){
-            std::cout << x << std::endl;
-
             if (tiles[y][x] == Q_NULLPTR){
                 break;
             }
@@ -411,8 +429,6 @@ void GraphicsScene::spawnNewTileAtRight()
         y = 0;
 
         while(y < 4){
-            std::cout << x << std::endl;
-
             if (tiles[y][x] == Q_NULLPTR){
                 break;
             }
@@ -445,8 +461,6 @@ void GraphicsScene::spawnNewTileAtLeft()
         y = 0;
 
         while(y < 4){
-            std::cout << x << std::endl;
-
             if (tiles[y][x] == Q_NULLPTR){
                 break;
             }
@@ -470,32 +484,74 @@ void GraphicsScene::spawnNewTileAtTop()
 {
     Tile *newTile = new Tile("2", 10);
 
+        int y = 0;
+        int x = 0;
+
+        x = qrand() % 4;
+
+        if (tiles[y][x] != Q_NULLPTR){
+            x = 0;
+
+            while(x < 4){
+                if (tiles[y][x] == Q_NULLPTR){
+                    break;
+                }
+
+            ++x;
+            }
+        }
+
+        if (x == 4) return;
+
+        tiles[y][x] = newTile;
+
+        newTile->setRect(-50.0, -50.0, 50, 50);
+
+        newTile->setPos(-30.0 + 100*x, -30.0);
+
+        this->addItem(newTile);
+}
+
+void GraphicsScene::spawnNewTileRandomly()
+{
+    Tile *newTile = new Tile("2", 10);
+
+    int xindices[4] = {0, 1, 2, 3};
+    int yindices[4] = {0, 1, 2, 3};
+
+    std::random_shuffle(std::begin(xindices), std::end(xindices));
+    std::random_shuffle(std::begin(yindices), std::end(yindices));
+
     int y = 0;
     int x = 0;
 
-    x = qrand() % 4;
+    bool exitLoop = false;
 
-    if (tiles[y][x] != Q_NULLPTR){
-        x = 0;
+    for (int i = 0; i < 4; ++i){
+        y = yindices[i];
 
-        while(x < 4){
-            std::cout << x << std::endl;
+        for(int j = 0; j < 4; ++j){
 
-            if (tiles[y][x] == Q_NULLPTR){
+            x = xindices[j];
+
+            if(tiles[y][x] == Q_NULLPTR){
+                std::cout << "i: " << i << " j: " << j << std::endl;
+                exitLoop = true;
                 break;
             }
-
-        ++x;
         }
+
+        if(exitLoop)
+            break;
     }
 
-    if (x == 4) return;
+    std::cout << "y: " << y << " x: " << x << std::endl;
 
     tiles[y][x] = newTile;
 
     newTile->setRect(-50.0, -50.0, 50, 50);
 
-    newTile->setPos(-30.0 + 100*x, -30.0);
+    newTile->setPos(-30.0 + 100*x, -30.0 + 100*y);
 
     this->addItem(newTile);
 }
@@ -512,7 +568,6 @@ void GraphicsScene::animateMove(Tile *tile, qreal dx, qreal dy, QTimeLine *timer
 {
     QGraphicsItemAnimation *animation = new QGraphicsItemAnimation;
 
-    std::cout << dx << " " << dy << std::endl;
     animation->setItem(tile);
     animation->setTimeLine(timer);
     animation->setPosAt(1, QPointF(tile->x() + dx, tile->y() + dy));

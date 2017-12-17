@@ -45,5 +45,5 @@ void MainWindow::displaySettings()
 
 void MainWindow::changeSettings()
 {
-
+    scene->changeSpawnMode();
 }
