@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <graphicsscene.h>
+#include <settingsdialog.h>
 
 namespace Ui {
 class MainWindow;
@@ -19,9 +20,12 @@ public:
 
 public slots:
     void resetGame();
+    void displaySettings();
+    void changeSettings();
 
 private:
     Ui::MainWindow *ui;
+    SettingsDialog *settings;
     GraphicsScene *scene;
 };
 

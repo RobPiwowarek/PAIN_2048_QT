@@ -27,12 +27,15 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
         graphicsscene.cpp \
-    tile.cpp
+    tile.cpp \
+    settingsdialog.cpp
 
 HEADERS += \
         mainwindow.h \
     graphicsscene.h \
-    tile.h
+    tile.h \
+    settingsdialog.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+    settingsdialog.ui
