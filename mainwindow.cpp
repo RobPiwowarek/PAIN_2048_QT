@@ -4,6 +4,7 @@
 #include <graphicsscene.h>
 #include <QtGui>
 #include <iostream>
+#include <graphicsview.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -11,9 +12,15 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    GraphicsView *view = new GraphicsView(this);
+
     scene = new GraphicsScene();
 
-    ui->graphicsView->setScene(scene);
+    QVBoxLayout* vl = ui->verticalLayout;
+
+    view->setScene(scene);
+
+    vl->addWidget(view);
 
     settings = new SettingsDialog(this);
 
@@ -30,7 +37,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::resizeEvent(QResizeEvent *event)
 {
-    ui->graphicsView->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+
 }
 
 void MainWindow::resetGame()

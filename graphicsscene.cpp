@@ -545,6 +545,11 @@ void GraphicsScene::spawnNewTileRandomly()
             break;
     }
 
+    if (!exitLoop){
+        gameover = true;
+        return;
+    }
+
     std::cout << "y: " << y << " x: " << x << std::endl;
 
     tiles[y][x] = newTile;
