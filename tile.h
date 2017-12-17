@@ -16,7 +16,7 @@ public:
 
     qreal getRadius() const;
     void setRadius(const qreal &value);
-    void squareTextValue();
+    int mergeTextValue();
 
 private:
     QString text;

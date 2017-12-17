@@ -16,6 +16,8 @@ public:
     ~MainWindow();
     void resizeEvent(QResizeEvent * event);
 
+public slots:
+    void resetGame();
 
 private:
     Ui::MainWindow *ui;

@@ -40,10 +40,11 @@ void Tile::setRadius(const qreal &value)
     radius = value;
 }
 
-void Tile::squareTextValue()
+int Tile::mergeTextValue()
 {
     int a = text.toInt();
     a += a;
     this->text = QString("%1").arg(a); //QString::fromStdString(std::to_string(a));
+    return a;
 }
 

@@ -34,6 +34,8 @@ GraphicsScene::GraphicsScene(QObject *parent){
 void GraphicsScene::keyPressEvent(QKeyEvent *keyEvent){
     if (gameover) return;
 
+    if (animation) return;
+
     switch(keyEvent->key()){
             case Qt::Key_Up:
                 up();
@@ -50,9 +52,58 @@ void GraphicsScene::keyPressEvent(QKeyEvent *keyEvent){
     }
 }
 
+void GraphicsScene::unlockKeyHandlers()
+{
+    animation = false;
+
+    foreach (Tile* tile, tilesToDelete) {
+        if (tile != Q_NULLPTR)
+            this->removeItem(tile);
+    }
+
+    tilesToDelete.clear();
+}
+
+void GraphicsScene::resetGame()
+{
+    for (int i = 0; i < 4; ++i)
+        for (int j = 0; j < 4; ++j){
+            if (tiles[i][j] != Q_NULLPTR){
+                this->removeItem(tiles[i][j]);
+                delete tiles[i][j];
+            }
+        }
+
+    this->score = 0;
+    emit setScore(QString("%1").arg(this->score));
+
+    gameover = false;
+    animation = false;
+
+    Tile *firstTile = new Tile("2", 10);
+    Tile *secondTile = new Tile("4", 10);
+
+    firstTile->setRect(-50.0, -50.0, 50, 50);
+    firstTile->setPos(170.0, -30.0);
+
+    secondTile->setRect(-50.0, -50.0, 50, 50);
+    secondTile->setPos(270.0, 70.0);
+
+    tiles[0][2] = firstTile;
+    tiles[1][3] = secondTile;
+
+    this->addItem(firstTile);
+    this->addItem(secondTile);
+}
+
 void GraphicsScene::up(){
     bool shouldSpawn = false;
-    QVector<Tile*> tilesToDelete(16);
+
+    QTimeLine *timer = new QTimeLine(250);
+
+    animation = true;
+
+    connect(timer, &QTimeLine::finished, this, &GraphicsScene::unlockKeyHandlers);
 
     for (int i = 1; i < 4; ++i){
         for (int j = 0; j < 4; ++j){
@@ -64,15 +115,13 @@ void GraphicsScene::up(){
                         break;
                 }
 
-                std::cout << "K: " << k << " I: " << i << " j: " << j << std::endl;
-
                 if (tiles[i-k][j] != Q_NULLPTR){
                     if (tiles[i][j]->getText() == tiles[i-k][j]->getText()){
-                        animateMove(tiles[i][j], 0.0, -100.0*k);
+                        animateMove(tiles[i][j], 0.0, -100.0*k, timer);
 
-                        // todo: update score
+                        score += tiles[i-k][j]->mergeTextValue();
 
-                        tiles[i-k][j]->squareTextValue();
+                        emit setScore( QString("%1").arg(this->score));
 
                         tiles[i-k][j]->update(tiles[i-k][j]->boundingRect());
 
@@ -84,7 +133,7 @@ void GraphicsScene::up(){
 
                     }
                     else{
-                            animateMove(tiles[i][j], 0.0, -100.0*(k-1));
+                            animateMove(tiles[i][j], 0.0, -100.0*(k-1), timer);
 
                             tiles[i-k+1][j] = tiles[i][j];
 
@@ -95,7 +144,7 @@ void GraphicsScene::up(){
                     }
                 }
                 else{
-                    animateMove(tiles[i][j], 0.0, -100.0*k);
+                    animateMove(tiles[i][j], 0.0, -100.0*k, timer);
 
                     tiles[i-k][j] = tiles[i][j];
 
@@ -107,16 +156,11 @@ void GraphicsScene::up(){
         }
     }
 
+    timer->start();
+
     if(shouldSpawn){
         spawnNewTileAtBottom();
     }
-
-    foreach (Tile* tile, tilesToDelete) {
-        if (tile != Q_NULLPTR)
-            this->removeItem(tile);
-    }
-
-    tilesToDelete.clear();
 }
 
 void GraphicsScene::down(){
@@ -187,16 +231,12 @@ void GraphicsScene::isOver()
                 gameover = true;
 }
 
-void GraphicsScene::animateMove(Tile *tile, qreal dx, qreal dy)
+void GraphicsScene::animateMove(Tile *tile, qreal dx, qreal dy, QTimeLine *timer)
 {
-    QTimeLine *timer = new QTimeLine(100);
-
     QGraphicsItemAnimation *animation = new QGraphicsItemAnimation;
 
     std::cout << dx << " " << dy << std::endl;
     animation->setItem(tile);
     animation->setTimeLine(timer);
     animation->setPosAt(1, QPointF(tile->x() + dx, tile->y() + dy));
-
-    timer->start();
 }
